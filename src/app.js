@@ -12,6 +12,7 @@ var ajax = require('ajax');
 var apiURL = 'http://32aab500.ngrok.com';
 var taskURL = apiURL + '/tasks.json';
 var notifURL = apiURL + '/notifications.json';
+var acceptNotifURL = apiURL + '/accept_notification/';
 
 var active_tasks = [];
 
@@ -129,6 +130,7 @@ function updateNotifications() {
       console.log('Successfully fetched data: '+data);
       
       var notif_latest = JSON.parse(data[data.length-1]);
+      notify_card.id = notif_latest.id;
       notify_card.title(notif_latest.type);
       notify_card.body(notif_latest.location);
       notify_card.on('click', 'select', function() {
@@ -145,6 +147,22 @@ function updateNotifications() {
 
 function acceptNotification(notify_card) {
   console.log('accepted card '+notify_card.id);
+  // Make the request
+  var acceptCurrentNotifURL = acceptNotifURL + '?notification_id=' + notify_card.id + '&user_id=' + 1;
+  ajax(
+    {
+      url: acceptCurrentNotifURL ,
+      type: 'json'
+    },
+    function(data) {
+      // Success!
+      console.log('Successfully ack notif id: '+notify_card.id);
+    },
+    function(error) {
+      // Failure!
+      console.log('Failed ack '+ acceptCurrentNotifURL +' id: ' + notify_card.id);
+    }
+  );
 }
 
 function updateTasks() {
