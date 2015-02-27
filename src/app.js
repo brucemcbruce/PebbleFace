@@ -164,11 +164,13 @@ function acceptNotification(notify_card) {
   ajax(
     {
       url: acceptCurrentNotifURL ,
-      type: 'json'
+      type: 'json',
+      method: 'post',
     },
     function(data) {
       // Success!
       console.log('Successfully ack notif id: '+notify_card.id);
+      console.log('Response: '+data);
       var success = JSON.parse(data).success;
       if(success == 'false'){
         already_ack_card.show();
