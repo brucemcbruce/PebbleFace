@@ -15,7 +15,20 @@ var notifURL = apiURL + '/notifications.json';
 var acceptNotifURL = apiURL + '/accept_notification';
 var raiseAlertURL = apiURL + '/notifications';
 
+var pollApiMillisecs = 2000;
+
 var active_tasks = [];
+
+var team_member_list = ['Dave Warner', 'Aaron Finch', 'Shane Watson', 'Steve Smith', 'Michael Clarke'];
+var role_list = ['Bakery', 'Deli', 'Produce', 'Service'];
+
+var DEFAULT_INITIAL_ROLE = role_list[0];
+var currentUser = '';
+var currentRole = DEFAULT_INITIAL_ROLE;
+
+var loginScreenShowDurationMillisecs = 1000;
+var logoutScreenShowDurationMillisecs = 1000;
+var breakScreenShowDurationMillisecs = 1000;
 
 var main = new UI.Menu({
   sections: [{
@@ -82,10 +95,12 @@ var location_list = new UI.Menu({
   }]
 });
 
+/*
 var shift_card = new UI.Card({
   title: 'Shift Details',
   body: 'Next Break: 3:30pm (15 minutes)\n Shift Ends: 7:00pm\n Next Shift: 14/02/2015 - 3:30pm-6:00pm'
 });
+*/
 
 main.show();
 
@@ -96,7 +111,11 @@ main.on('select', function(e) {
   } else if(selection == 'Notify') {
     notify_list.show();
   } else if(selection == 'Shift') {
-    shift_card.show();
+    if (userIsSignedOn()) {
+      shift_list.show();
+    } else {
+      shift_select_user_to_signin_list.show();
+    }
   }
 });
 
@@ -108,7 +127,7 @@ notify_list.on('select', function(e) {
 setInterval(function(){
   updateTasks();
   updateNotifications();
-}, 5000);
+}, pollApiMillisecs);
 
 function alertOnNewTasksAndClearOldTasks(fetched_tasks) {
   var new_active_tasks = [];
@@ -252,4 +271,133 @@ location_list.on('select', function(e) {
   );
   main.show();
 });
+
+// Shift menu handling
+var shift_list = new UI.Menu({
+  sections: [{
+    title: 'Shift Details',
+    items: [{
+      title: 'Break'
+    }, {
+      title: 'Change Role'
+    }, {
+      title: 'Sign Off'
+    }]
+  }]
+});
+
+var shift_select_user_to_signin_list = new UI.Menu({
+  sections: [{ title: 'Select team member', items: [{ }]}]
+});
+
+// Initialise Users list menu - shift_select_user_to_signin_list
+for (var i = 0; i < team_member_list.length; i++) {
+  var member = team_member_list[i];
+  shift_select_user_to_signin_list.item(0, i, {title: member});
+}
+
+var shift_change_role_list = new UI.Menu({
+  sections: [{ title: 'Select role', items: [{ }]}]
+});
+
+// Initialise role list menu - shift_change_role_list
+for (var i = 0; i < role_list.length; i++) {
+  var role = role_list[i];
+  shift_change_role_list.item(0, i, {title: role});
+}
+
+var isSignedOn = false;
+function userIsSignedOn() {
+  // Not doing anything complex right now...
+  return isSignedOn;
+}
+function signOn(user) {
+  isSignedOn = true;
+  currentUser = user;
+  currentRole = DEFAULT_INITIAL_ROLE;
+}
+function signOff() {
+  isSignedOn = false;
+  currentUser = '';
+}
+
+var user_logged_in_card = new UI.Card ({
+  title: 'Logged in'
+});
+var user_logged_out_card = new UI.Card ({
+  title: 'Logged out'
+});
+
+shift_select_user_to_signin_list.on('select', function(e) {
+  var userToLogIn = e.item.title;
+  console.log('Log in : ' + userToLogIn + '.');
+  signOn(userToLogIn);
+  user_logged_in_card.title('Logged in ' + userToLogIn);
+  user_logged_in_card.show();
+  setTimeout(function() {
+    shift_list.show();
+    user_logged_in_card.hide();
+    // Hide this screen also
+    shift_select_user_to_signin_list.hide();
+  }, loginScreenShowDurationMillisecs);
+});
+
+shift_list.on('select', function(e) {
+  var selection = e.item.title;
+  if (selection == 'Sign Off') {
+    user_logged_out_card.title('Logged out ' + currentUser);
+    signOff();
+    user_logged_out_card.show();
+    setTimeout(function() {
+      user_logged_out_card.hide();
+      // Hide this screen also
+      shift_list.hide();
+    }, logoutScreenShowDurationMillisecs);
+  } else if (selection == 'Break') {
+    shift_break_list.show();
+    setTimeout(function() {
+      shift_break_list.hide();
+    }, breakScreenShowDurationMillisecs);
+  } else if (selection == 'Change Role') {
+    updateRoleListToShowCurrentRole();
+    shift_change_role_list.show();
+  }
+});
+
+var shift_break_list = new UI.Card ({
+  title: 'Remember',
+  subtitle: 'Smoking is bad for your health!'
+});
+
+/*
+var shift_change_role_list = new UI.Menu ({
+  sections: [{
+    title: 'Select Role',
+    items: [{
+      title: 'Bakery'
+    }, {
+      title: 'Deli'
+    }, {
+      title: 'Produce'
+    }, {
+      title: 'Service'
+    }]
+  }]
+});
+*/
+shift_change_role_list.on('select', function(e) {
+  currentRole = e.item.title;
+  shift_change_role_list.hide();
+  updateRoleListToShowCurrentRole();
+});
+
+function updateRoleListToShowCurrentRole() {
+  for (var i = 0; i < shift_change_role_list.items(0).length; i++) {
+    if (shift_change_role_list.item(0, i).title === currentRole) {
+      shift_change_role_list.item(0, i, {subtitle: 'current role'});
+    } else {
+      shift_change_role_list.item(0, i, {subtitle: ''});
+    }
+  } 
+}
 
