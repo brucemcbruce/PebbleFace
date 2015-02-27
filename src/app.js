@@ -118,6 +118,14 @@ var notify_card = new UI.Card({
   title: "No notifications yet."
 });
 
+var already_ack_card = new UI.Card({
+  title: "Error.",
+  body: "Already Ack Notification."
+});
+already_ack_card.on('click', 'select', function() {
+  already_ack_card.hide();
+});
+
 notify_card.on('click', 'select', function() {
   acceptNotification(notify_card);
   notify_card.hide();
@@ -161,6 +169,10 @@ function acceptNotification(notify_card) {
     function(data) {
       // Success!
       console.log('Successfully ack notif id: '+notify_card.id);
+      var success = JSON.parse(data).success;
+      if(success == 'false'){
+        already_ack_card.show();
+      }
     },
     function(error) {
       // Failure!
