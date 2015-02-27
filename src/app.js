@@ -113,6 +113,10 @@ function activeTasksContains(target_id) {
   return false;
 }
 
+var notify_card = new UI.Card({
+  title: "No notifications yet."
+});
+
 function updateNotifications() {
   // Make the request
   ajax(
@@ -124,10 +128,11 @@ function updateNotifications() {
       // Success!
       console.log('Successfully fetched data: '+data);
       
-      var notif_latest = JSON.parse(data[data.length]);
-      var notify_card = new UI.Card({
-        title: notif_latest.type,
-        body: notif_latest.location
+      var notif_latest = JSON.parse(data[data.length-1]);
+      notify_card.title(notif_latest.type);
+      notify_card.body(notif_latest.location);
+      notify_card.on('click', 'select', function() {
+        acceptNotification(notify_card);
       });
       notify_card.show();
     },
@@ -136,6 +141,10 @@ function updateNotifications() {
       console.log('Failed fetching '+ notifURL +' data: ' + error);
     }
   );
+}
+
+function acceptNotification(notify_card) {
+  console.log('accepted card '+notify_card.id);
 }
 
 function updateTasks() {
