@@ -37,37 +37,31 @@ var tasks_list = new UI.Menu({
   }]
 });
 
+var notify_list = new UI.Menu({
+  sections: [{
+    items: [
+      { 
+        title: 'Spill',
+      }, {
+        title: 'Trolleys', 
+      }, {
+        title: 'Help Needed', 
+      }, {
+        title: 'Customer Query', 
+      }, {
+        title: 'Security Check', 
+      }, {
+        title: 'Truck Arrival', 
+      }, {
+        title: 'Fill Gap'
+      }
+    ]
+  }]
+});
+
 var shift_card = new UI.Card({
   title: 'Shift Details',
   body: 'Next Break: 3:30pm (15 minutes)\n Shift Ends: 7:00pm\n Next Shift: 14/02/2015 - 3:30pm-6:00pm'
-});
-
-var notify_list = new UI.Menu({
-  sections: [{
-    title: 'General Notifications',
-    items: [{
-      title: 'Notify Manager',
-      subtitle: 'John Smith'
-    }, {
-      title: 'Notify Prodice',
-      subtitle: 'Joe Brown'
-    }, {
-      title: 'Notify Longlife',
-      subtitle: 'Matt Cole'
-    }]
-  }, {
-    title: 'Emergency',
-    items: [{
-      title: 'Alert Manager',
-      subtitle: 'John Smith'
-    }, {
-      title: 'Alert Security',
-      subtitle: 'Sam Smith'
-    }, {
-      title: 'Alert Police',
-      subtitle: '000'
-    }]
-  }]
 });
 
 main.show();
