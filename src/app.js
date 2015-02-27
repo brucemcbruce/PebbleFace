@@ -8,6 +8,11 @@ var UI = require('ui');
 var Vibe = require('ui/vibe');
 var ajax = require('ajax');
 
+// API URL
+var apiURL = 'http://32aab500.ngrok.com';
+var taskURL = apiURL + '/tasks.json';
+var notifURL = apiURL + '/notifications.json';
+
 var active_tasks = [];
 
 var main = new UI.Menu({
@@ -80,6 +85,7 @@ main.on('select', function(e) {
 
 setInterval(function(){
   updateTasks();
+  updateNotifications();
 }, 5000);
 
 function alertOnNewTasksAndClearOldTasks(fetched_tasks) {
@@ -107,11 +113,32 @@ function activeTasksContains(target_id) {
   return false;
 }
 
+function updateNotifications() {
+  // Make the request
+  ajax(
+    {
+      url: notifURL,
+      type: 'json'
+    },
+    function(data) {
+      // Success!
+      console.log('Successfully fetched data: '+data);
+      
+      var notif_latest = JSON.parse(data[data.length]);
+      var notify_card = new UI.Card({
+        title: notif_latest.type,
+        body: notif_latest.location
+      });
+      notify_card.show();
+    },
+    function(error) {
+      // Failure!
+      console.log('Failed fetching '+ notifURL +' data: ' + error);
+    }
+  );
+}
+
 function updateTasks() {
-  // Construct URL
-  var URL = 'http://32aab500.ngrok.com';
-  var taskURL = URL + '/tasks.json';
-  
   // Make the request
   ajax(
     {
