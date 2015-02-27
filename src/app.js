@@ -166,10 +166,18 @@ already_ack_card.on('click', 'select', function() {
   already_ack_card.hide();
 });
 
+notify_card.on('click', 'back', function() {
+  denyNotification(notify_card);
+  notify_card.hide();
+});
+
 notify_card.on('click', 'select', function() {
   acceptNotification(notify_card);
   notify_card.hide();
 });
+
+
+var dismissed_alerts = [];
 
 function updateNotifications() {
   // Make the request
@@ -183,12 +191,14 @@ function updateNotifications() {
       console.log('Successfully fetched data: '+data);
       
       if (data.length > 0) {
-        var notif_latest = JSON.parse(data[data.length-1]);
-        notify_card.id = notif_latest.id;
-        notify_card.title(notif_latest.type);
-        notify_card.body(notif_latest.location);
-        notify_card.show();
-        Vibe.vibrate('double');
+        var notif_latest = getNextNotification(data, 1);
+        if(notif_latest !== false) {
+          notify_card.id = notif_latest.id;
+          notify_card.title('Alert: ' + notif_latest.type);
+          notify_card.body('In ' + notif_latest.location + '. Please press middle button to accept or back to cancel.');
+          notify_card.show();
+          Vibe.vibrate('double');
+        }
       }
     },
     function(error) {
@@ -196,6 +206,26 @@ function updateNotifications() {
       console.log('Failed fetching '+ notifURL +' data: ' + error);
     }
   );
+}
+
+function getNextNotification(data, index) {
+  var notif = JSON.parse(data[data.length-index]);
+  if(dismissed_alerts.indexOf(notif.id) != -1) {
+    //Show the alert
+    return notif;
+  } else {
+    //Dont show the alert;
+    if(data.lenth >= index + 1) {
+      getNextNotification(data, index + 1);
+    } else {
+      return false;
+    }
+  }
+}
+
+function denyNotification(notify_card) {
+  console.log('denied card '+notify_card.id);
+  dismissed_alerts.push(notify_card.id);
 }
 
 function acceptNotification(notify_card) {
@@ -366,7 +396,7 @@ shift_list.on('select', function(e) {
 
 var shift_break_list = new UI.Card ({
   title: 'Remember',
-  subtitle: 'Smoking is bad for your health!'
+  subtitle: 'Enjoy your break!'
 });
 
 /*
