@@ -218,7 +218,7 @@ function getNextNotification(data, index) {
     return notif;
   } else {
     //Dont show the alert;
-    if(data.lenth >= index + 1) {
+    if(data.length >= index + 1) {
       getNextNotification(data, index + 1);
     } else {
       return false;
