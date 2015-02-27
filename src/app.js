@@ -120,7 +120,7 @@ var notify_card = new UI.Card({
 
 var already_ack_card = new UI.Card({
   title: "Error.",
-  body: "Already Ack Notification."
+  body: "Someone else has already actioned notification."
 });
 already_ack_card.on('click', 'select', function() {
   already_ack_card.hide();
@@ -163,15 +163,13 @@ function acceptNotification(notify_card) {
   var acceptCurrentNotifURL = acceptNotifURL + '?notification_id=' + notify_card.id + '&user_id=' + 1;
   ajax(
     {
-      url: acceptCurrentNotifURL 
-//       type: 'json'
+      url: acceptCurrentNotifURL ,
+      type: 'json'
     },
     function(data) {
       // Success!
       console.log('Successfully ack notif id: '+notify_card.id);
-      console.log('Ack Response (raw): '+data);
-      console.log('Ack Response (parsed): '+JSON.parse(data));
-      var success = JSON.parse(data).success;
+      var success = data.success;
       if(success == 'false'){
         already_ack_card.show();
       }
