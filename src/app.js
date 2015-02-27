@@ -98,11 +98,12 @@ function alertOnNewTasksAndClearOldTasks(fetched_tasks) {
 }
 
 function activeTasksContains(target_id) {
-  active_tasks.forEach(function(entry) {
+  for (var i = 0; i < active_tasks.length; i++) {
+    var entry = active_tasks[i];
     if (entry.id === target_id) {
       return true;
     }
-  });
+  }
   return false;
 }
 
@@ -119,9 +120,8 @@ function updateTasks() {
     },
     function(data) {
       // Success!
-      console.log('Successfully fetched data!');
+      console.log('Successfully fetched data: '+data);
       var section = [];
-      console.log(data);
     
       for(var i=0; i<data.length; i++){
         var element = JSON.parse(data[i]);
