@@ -15,7 +15,8 @@ var notifURL = apiURL + '/notifications.json';
 var acceptNotifURL = apiURL + '/accept_notification';
 var raiseAlertURL = apiURL + '/notifications';
 
-var pollApiMillisecs = 2000;
+var pollTasksMillisecs = 30000;
+var pollNotificationsMillisecs = 4000;
 
 var active_tasks = [];
 
@@ -126,8 +127,10 @@ notify_list.on('select', function(e) {
 
 setInterval(function(){
   updateTasks();
+}, pollTasksMillisecs);
+setInterval(function(){
   updateNotifications();
-}, pollApiMillisecs);
+}, pollNotificationsMillisecs);
 
 function alertOnNewTasksAndClearOldTasks(fetched_tasks) {
   var new_active_tasks = [];
