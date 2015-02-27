@@ -13,6 +13,7 @@ var apiURL = 'http://32aab500.ngrok.com';
 var taskURL = apiURL + '/tasks.json';
 var notifURL = apiURL + '/notifications.json';
 var acceptNotifURL = apiURL + '/accept_notification';
+var raiseAlertURL = apiURL + '/notifications';
 
 var active_tasks = [];
 
@@ -59,6 +60,28 @@ var notify_list = new UI.Menu({
   }]
 });
 
+var location_list = new UI.Menu({
+  sections: [{
+    items: [
+      { 
+        title: 'Bakery',
+      }, {
+        title: 'Deli', 
+      }, {
+        title: 'Produce', 
+      }, {
+        title: 'Aisle 1', 
+      }, {
+        title: 'Aisle 2', 
+      }, {
+        title: 'Aisle 3', 
+      }, {
+        title: 'Aisle 4'
+      }
+    ]
+  }]
+});
+
 var shift_card = new UI.Card({
   title: 'Shift Details',
   body: 'Next Break: 3:30pm (15 minutes)\n Shift Ends: 7:00pm\n Next Shift: 14/02/2015 - 3:30pm-6:00pm'
@@ -77,6 +100,10 @@ main.on('select', function(e) {
   }
 });
 
+notify_list.on('select', function(e) {
+  location_list.alert_type = e.item.title;
+  location_list.show();
+});
 
 setInterval(function(){
   updateTasks();
@@ -93,7 +120,7 @@ function alertOnNewTasksAndClearOldTasks(fetched_tasks) {
     new_active_tasks.push(entry);
   });
   if (new_tasks) {
-    Vibe.vibrate('double');
+    Vibe.vibrate('short');
   }
   return new_active_tasks;
 }
@@ -142,6 +169,7 @@ function updateNotifications() {
         notify_card.title(notif_latest.type);
         notify_card.body(notif_latest.location);
         notify_card.show();
+        Vibe.vibrate('double');
       }
     },
     function(error) {
@@ -202,3 +230,26 @@ function updateTasks() {
     }
   );
 }
+
+location_list.on('select', function(e) {
+  var notification_location = e.item.title;
+  var notification_type = location_list.alert_type;
+  console.log("Raising "+notification_type+" at "+notification_location);
+  ajax(
+    {
+      url: raiseAlertURL + '?notification_location=' + encodeURIComponent(notification_location) + '&notification_type=' + encodeURIComponent(notification_type),
+      type: 'json',
+      method: 'post',
+    },
+    function(data) {
+      // Success!
+      console.log('Successfully raised notification, data: '+data);
+    },
+    function(error) {
+      // Failure!
+      console.log('Failed creating '+notification_type+' notification, data: ' + error);
+    }
+  );
+  main.show();
+});
+
