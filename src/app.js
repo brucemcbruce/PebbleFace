@@ -30,6 +30,7 @@ var currentRole = DEFAULT_INITIAL_ROLE;
 var loginScreenShowDurationMillisecs = 1000;
 var logoutScreenShowDurationMillisecs = 1000;
 var breakScreenShowDurationMillisecs = 1000;
+var roleChangeScreenShowDurationMillisecs = 1000;
 
 var main = new UI.Menu({
   sections: [{
@@ -112,11 +113,7 @@ main.on('select', function(e) {
   } else if(selection == 'Notify') {
     notify_list.show();
   } else if(selection == 'Shift') {
-    if (userIsSignedOn()) {
-      shift_list.show();
-    } else {
-      shift_select_user_to_signin_list.show();
-    }
+    handle_show_shift_menu();
   }
 });
 
@@ -337,6 +334,14 @@ var shift_select_user_to_signin_list = new UI.Menu({
   sections: [{ title: 'Select team member', items: [{ }]}]
 });
 
+function handle_show_shift_menu() {
+    if (userIsSignedOn()) {
+      shift_list.show();
+    } else {
+      shift_select_user_to_signin_list.show();
+    } 
+}
+
 // Initialise Users list menu - shift_select_user_to_signin_list
 for (var i = 0; i < team_member_list.length; i++) {
   var member = team_member_list[i];
@@ -389,8 +394,14 @@ shift_select_user_to_signin_list.on('select', function(e) {
   }, loginScreenShowDurationMillisecs);
 });
 
+var shift_break_list = new UI.Card ({
+  title: 'Remember',
+  subtitle: 'Enjoy your break!'
+});
+
 shift_list.on('select', function(e) {
   var selection = e.item.title;
+  console.log('Shift menu selected item : ' + selection + '.');
   if (selection == 'Sign Off') {
     user_logged_out_card.title('Logged out ' + currentUser);
     signOff();
@@ -411,31 +422,18 @@ shift_list.on('select', function(e) {
   }
 });
 
-var shift_break_list = new UI.Card ({
-  title: 'Remember',
-  subtitle: 'Enjoy your break!'
+var shift_confirm_role_changed = new UI.Card ({
+  title: 'User role changed'
 });
 
-/*
-var shift_change_role_list = new UI.Menu ({
-  sections: [{
-    title: 'Select Role',
-    items: [{
-      title: 'Bakery'
-    }, {
-      title: 'Deli'
-    }, {
-      title: 'Produce'
-    }, {
-      title: 'Service'
-    }]
-  }]
-});
-*/
 shift_change_role_list.on('select', function(e) {
   currentRole = e.item.title;
+  shift_confirm_role_changed.show();
+  setTimeout(function() {
+      shift_confirm_role_changed.hide();
+    }, roleChangeScreenShowDurationMillisecs);
   shift_change_role_list.hide();
-  updateRoleListToShowCurrentRole();
+  //updateRoleListToShowCurrentRole();
 });
 
 function updateRoleListToShowCurrentRole() {
@@ -447,4 +445,3 @@ function updateRoleListToShowCurrentRole() {
     }
   } 
 }
-
