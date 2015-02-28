@@ -310,6 +310,12 @@ location_list.on('select', function(e) {
     function(data) {
       // Success!
       console.log('Successfully raised notification, data: '+data);
+      var obj = JSON.parse(data);
+      console.log('OBJ:');
+      console.log(obj);
+      console.log("ID:");
+      console.log(obj.id);
+      dismissed_alerts.push(obj.id);
     },
     function(error) {
       // Failure!
