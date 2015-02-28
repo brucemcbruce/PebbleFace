@@ -304,18 +304,12 @@ location_list.on('select', function(e) {
   ajax(
     {
       url: raiseAlertURL + '?notification_location=' + encodeURIComponent(notification_location) + '&notification_type=' + encodeURIComponent(notification_type),
-      type: 'json',
       method: 'post',
     },
     function(data) {
       // Success!
-      console.log('Successfully raised notification, data: '+data);
       var obj = JSON.parse(data);
-      console.log('OBJ:');
-      console.log(obj);
-      console.log("ID:");
-      console.log(obj.id);
-      dismissed_alerts.push(obj.id);
+      dismissed_alerts.push(parseInt(obj.notifiction_id));
     },
     function(error) {
       // Failure!
