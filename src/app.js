@@ -259,7 +259,6 @@ function acceptNotification(notify_card) {
       console.log('Successfully ack notif id: '+notify_card.id);
       var success = data.success;
       if(success == 'false'){
-        already_ack_card.show();
       }
     },
     function(error) {
