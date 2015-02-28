@@ -195,7 +195,14 @@ function updateNotifications() {
       
       if (data.length > 0) {
         var notif_latest = getNextNotification(data, 1);
+        console.log('NOTIFICATION FROM FUNCTION>>');
+        console.log(notif_latest);
+        console.log("TEST FOR UNDEFINED");
+        console.log(typeof(notif_latest) != 'undefined');
+        console.log("TEST FOR FALSE");
+        console.log(notif_latest !== false);
         if(notif_latest !== false) {
+          console.log("CREATING CARD");
           notify_card.id = notif_latest.id;
           notify_card.title('Alert: ' + notif_latest.type);
           notify_card.body('In ' + notif_latest.location + '. Please press middle button to accept or back to cancel.');
@@ -212,14 +219,21 @@ function updateNotifications() {
 }
 
 function getNextNotification(data, index) {
+  console.log('Data: ' + data);
+  console.log('INdex: ' + index);
+  
   var notif = JSON.parse(data[data.length-index]);
-  if(dismissed_alerts.indexOf(notif.id) != -1) {
+  console.log('Getting Notifications.' + notif);
+  console.log('Dismissed Alerts: '+ dismissed_alerts);
+  console.log('Index of logs: ' + dismissed_alerts.indexOf(parseInt(notif.id)));
+  
+  if(dismissed_alerts.indexOf(parseInt(notif.id)) == -1) {
     //Show the alert
     return notif;
   } else {
     //Dont show the alert;
     if(data.length >= index + 1) {
-      getNextNotification(data, index + 1);
+      return getNextNotification(data, index + 1);
     } else {
       return false;
     }
@@ -228,7 +242,7 @@ function getNextNotification(data, index) {
 
 function denyNotification(notify_card) {
   console.log('denied card '+notify_card.id);
-  dismissed_alerts.push(notify_card.id);
+  dismissed_alerts.push(parseInt(notify_card.id));
 }
 
 function acceptNotification(notify_card) {
