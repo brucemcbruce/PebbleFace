@@ -159,8 +159,8 @@ var notify_card = new UI.Card({
 });
 
 var already_ack_card = new UI.Card({
-  title: "Error.",
-  body: "Someone else has already actioned notification."
+  title: "Dismissed!",
+  body: "Someone else has already been assigned to it."
 });
 already_ack_card.on('click', 'select', function() {
   already_ack_card.hide();
@@ -256,6 +256,7 @@ function acceptNotification(notify_card) {
       console.log('Successfully ack notif id: '+notify_card.id);
       var success = data.success;
       if(success == 'false'){
+        already_ack_card.show();
       }
     },
     function(error) {
