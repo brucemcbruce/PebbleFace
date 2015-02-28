@@ -263,6 +263,7 @@ function acceptNotification(notify_card) {
     },
     function(error) {
       // Failure!
+      // Fake Push.
       console.log('Failed ack '+ acceptCurrentNotifURL +' id: ' + notify_card.id);
     }
   );
